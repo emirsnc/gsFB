@@ -1,0 +1,71 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+data = {
+    'İstatistik': ['Toplam Şut', 'İsabetli Şut', 'Korner', 'Orta', 'Faul', 'Pas Arası', 'Ofsayt', 'Sarı Kart', 'Kırmızı Kart'],
+    'Galatasaray': [11, 0, 1, 12, 18, 8, 1, 4, 0],
+    'Fenerbahçe': [11, 1, 5, 15, 10, 6, 3, 7, 1]
+}
+
+df = pd.DataFrame(data)
+
+# Takım Renkleri
+color_gs = '#A32638'  
+color_fb = '#04376c' 
+
+# Dashboard Düzeni 
+fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+fig.suptitle('Derbi Detaylı Maç Analizi: Galatasaray 0 - 1 Fenerbahçe\n(19 Mayıs 2024 - RAMS Park)', fontsize=18, fontweight='bold', y=0.98)
+
+# --- 1. GRAFİK ---
+ax1 = axes[0, 0]
+possession = [69, 31]
+labels = ['Galatasaray\n%69', 'Fenerbahçe\n%31']
+wedges, texts, autotexts = ax1.pie(possession, labels=labels, colors=[color_gs, color_fb], 
+                                   autopct='%1.1f%%', startangle=90, pctdistance=0.85,
+                                   textprops=dict(color="white", fontweight='bold', fontsize=12))
+centre_circle = plt.Circle((0,0),0.70,fc='white')
+ax1.add_artist(centre_circle)
+for text in texts:
+    text.set_color('black')
+ax1.set_title('Topla Oynama Oranı', fontsize=14, fontweight='bold')
+
+
+def plot_grouped_bars(ax, df_subset, title):
+    x = np.arange(len(df_subset))
+    width = 0.35
+    
+    rects1 = ax.bar(x - width/2, df_subset['Galatasaray'], width, label='Galatasaray', color=color_gs)
+    rects2 = ax.bar(x + width/2, df_subset['Fenerbahçe'], width, label='Fenerbahçe', color=color_fb)
+    
+    ax.set_title(title, fontsize=14, fontweight='bold')
+    ax.set_xticks(x)
+    ax.set_xticklabels(df_subset['İstatistik'], fontsize=11)
+    ax.legend()
+    ax.grid(axis='y', linestyle='--', alpha=0.5)
+    
+
+    ax.bar_label(rects1, padding=3, fontsize=11)
+    ax.bar_label(rects2, padding=3, fontsize=11)
+
+
+# --- 2. GRAFİK ---
+ax2 = axes[0, 1]
+df_attack = df.iloc[[0, 1, 2, 3]] # Şut, İsabetli Şut, Korner, Orta
+plot_grouped_bars(ax2, df_attack, 'Hücum ve Üretkenlik')
+
+# --- 3. GRAFİK ---
+ax3 = axes[1, 0]
+df_discipline = df.iloc[[4, 7, 8]] # Faul, Sarı Kart, Kırmızı Kart
+plot_grouped_bars(ax3, df_discipline, 'Disiplin ve Sertlik')
+
+# --- 4. GRAFİK ---
+ax4 = axes[1, 1]
+df_action = df.iloc[[5, 6]] # Pas Arası, Ofsayt
+plot_grouped_bars(ax4, df_action, 'Savunma ve Taktik Aksiyonlar')
+
+plt.tight_layout()
+plt.subplots_adjust(top=0.90) # başlık için
+plt.show()
